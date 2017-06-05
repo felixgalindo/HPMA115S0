@@ -14,7 +14,7 @@ SoftwareSerial hpmaSerial(10, 11); // RX, TX
 HPMA115S0 hpma115S0(hpmaSerial);
  
 void setup() {
-  hpma115S0.init();
+  hpma115S0.Init();
   hpma115S0.StartParticleMeasurement();
 }
 

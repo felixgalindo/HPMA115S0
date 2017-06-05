@@ -1,5 +1,5 @@
 /**
- * @file hpma115S0.cpp
+ * @file HPMA115S0.cpp
  * @author Felix Galindo
  * @date June 2017
  * @brief Arduino Library for Honeywell's Particle Sensor (HPMA115S0-XXX)
@@ -7,7 +7,7 @@
  */
 
 #include "Arduino.h"
-#include "honeywell-particle-sensor.h"
+#include "HPMA115S0.h"
 
 extern "C" {
 #include <string.h>
