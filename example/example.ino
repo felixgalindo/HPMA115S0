@@ -2,8 +2,8 @@
  * @file example.ino
  * @author Felix Galindo
  * @date June 2017
- * @brief Example using HPMA115S0 sensor library on a Featherwing
- * @note 
+ * @brief Example using HPMA115S0 sensor library on a Feather 32u4
+ * @license MIT
  */
 
  #include <HPMA115S0.h>
