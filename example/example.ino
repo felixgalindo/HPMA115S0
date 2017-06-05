@@ -6,9 +6,9 @@
  * @note 
  */
 
- #include <hpma115S0.h>
+ #include <HPMA115S0.h>
  #include <SoftwareSerial.h>
-SoftwareSerial hpmaSerial(10, 11); // RX, TX
+SoftwareSerial hpmaSerial(5, 2); // RX, TX
 
 //create an instance of the hpma115S0 library
 HPMA115S0 hpma115S0(hpmaSerial);

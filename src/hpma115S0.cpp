@@ -31,7 +31,7 @@ HPMA115S0::HPMA115S0(Stream& serial):
  * @return  a String containing sensor response
  */
 void HPMA115S0::Init() {
-  Serial.println("PS: initializing...");
+  Serial.println("PS- Initializing...");
   StartParticleMeasurement();
   EnableAutoSend();
 }
@@ -43,7 +43,6 @@ void HPMA115S0::Init() {
  * @return  a String containing sensor response
  */
 String HPMA115S0::SendCmd(char * command, unsigned int size) {
-  Serial.println("PS Cmd:" + command);
   while (_serial.available())
     _serial.read();
 
@@ -103,7 +102,7 @@ void HPMA115S0::Update() {
     incomingByte = Serial.read();
 
     // say what you got:
-    Serial.print("I received: ");
+    Serial.print("PS- I received: ");
     Serial.println(incomingByte, DEC);
   }
 }
