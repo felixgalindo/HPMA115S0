@@ -26,6 +26,9 @@ void setup() {
 }
 
 void loop() {
-  hpma115S0.ReadParticleMeasurement();
+  unsigned int pm2_5,pm10;
+  hpma115S0.ReadParticleMeasurement(&pm2_5,&pm10);
+  Serial.println("PM 2.5: " + String(pm2_5) + " ug/m3" );
+  Serial.println("PM 10: " + String(pm10) + " ug/m3" );
   delay(1000);
 }

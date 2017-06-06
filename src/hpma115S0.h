@@ -53,8 +53,8 @@ public:
     /**
      * @brief Function that sends a read command to sensor
      * @return  returns true if valid measurements were read from sensor
-     */
-    boolean HPMA115S0::ReadParticleMeasurement();
+     */boolean ReadParticleMeasurement(unsigned int * pm2_5, unsigned int * pm10)
+    ;
 
     /**
      * @brief Function that starts sensor measurement

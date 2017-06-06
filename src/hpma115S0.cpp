@@ -89,6 +89,8 @@ int HPMA115S0::ReadCmdResp(unsigned char * dataBuf, unsigned int dataBufSize, un
     if (respBuf[HPM_LEN_IDX] && ((respBuf[HPM_LEN_IDX] + 1) <=  sizeof(respBuf) - 2) && (respBuf[HPM_LEN_IDX] - 1) <= dataBufSize ) {
       if (_serial.readBytes(&respBuf[HPM_CMD_IDX], respBuf[HPM_LEN_IDX] + 1) == (respBuf[HPM_LEN_IDX] + 1)) { //read respBuf[HPM_LEN_IDX] num of bytes + calChecksum byte
         if (respBuf[HPM_CMD_IDX] == cmdType) { //check if CMD type matches
+
+          //Calculate and validate checksum
           for (respIdx = 0; respIdx < (2 + respBuf[HPM_LEN_IDX]); respIdx++) {
             calChecksum += respBuf[respIdx];
           }
@@ -111,7 +113,7 @@ int HPMA115S0::ReadCmdResp(unsigned char * dataBuf, unsigned int dataBufSize, un
  * @brief Function that sends a read command to sensor
  * @return  returns true if valid measurements were read from sensor
  */
-boolean HPMA115S0::ReadParticleMeasurement() {
+boolean HPMA115S0::ReadParticleMeasurement(unsigned int * pm2_5, unsigned int * pm10) {
   const char cmdBuf[] = {0x68, 0x01, 0x04, 0x93};
   static unsigned char dataBuf[HPM_READ_PARTICLE_MEASURMENT_LEN - 1];
 
@@ -124,9 +126,10 @@ boolean HPMA115S0::ReadParticleMeasurement() {
   if (ReadCmdResp(dataBuf, sizeof(dataBuf), READ_PARTICLE_MEASURMENT) == (HPM_READ_PARTICLE_MEASURMENT_LEN - 1)) {
     _pm2_5 = dataBuf[0] * 256 + dataBuf[1];
     _pm10 = dataBuf[2] * 256 + dataBuf[3];
-
-    Serial.println("PS- PM 2.5: " + String(_pm2_5) + " ug/m3" );
-    Serial.println("PS- PM 10: " + String(_pm10) + " ug/m3" );
+    *pm2_5 = _pm2_5;
+    *pm10 = _pm10;
+    // Serial.println("PS- PM 2.5: " + String(_pm2_5) + " ug/m3" );
+    // Serial.println("PS- PM 10: " + String(_pm10) + " ug/m3" );
     return true;
   }
   return false;
