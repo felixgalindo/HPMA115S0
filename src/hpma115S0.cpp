@@ -46,7 +46,7 @@ void HPMA115S0::Init() {
  * @return  void
  */
 void HPMA115S0::SendCmd(unsigned char * cmdBuf, unsigned int cmdSize) {
-  //Clear rx
+  //Clear RX
   while (_serial.available())
     _serial.read();
 
