@@ -12,6 +12,27 @@
 
 #include "Arduino.h"
 
+#define HPM_CMD_RESP_HEAD 0x40
+#define HPM_MAX_RESP_SIZE 8 // max command response size is 8 bytes
+#define HPM_READ_PARTICLE_MEASURMENT_LEN 5
+
+enum CMD_TYPE_T {
+    READ_PARTICLE_MEASURMENT = 0x04,
+    START_PARTICLE_MEASURMENT = 0x01,
+    STOP_PARTICLE_MEASURMENT = 0x02,
+    SET_ADJUSTMENT_COEFFICIENT = 0x08,
+    READ_ADJUSTMENT_COEFFICIENT = 0x08,
+    STOP_AUTO_SEND = 0x20,
+    ENABLE_AUTO_SEND = 0x40,
+};
+
+enum HPM_PACKET_T {
+    HPM_HEAD_IDX,
+    HPM_LEN_IDX,
+    HPM_CMD_IDX,
+    HPM_DATA_START_IDX
+};
+
 class HPMA115S0
 {
 public:
@@ -28,6 +49,12 @@ public:
      * @return  a String containing sensor response
      */
     void Init();
+
+    /**
+     * @brief Function that sends a read command to sensor
+     * @return  returns true if valid measurements were read from sensor
+     */
+    boolean HPMA115S0::ReadParticleMeasurement();
 
     /**
      * @brief Function that starts sensor measurement
@@ -53,41 +80,44 @@ public:
     void DisableAutoSend();
 
     /**
-     * @brief Function that reads serial data and updates measurements
-     * @return  void
-     */
-    void Update();
-
-    /**
     * @brief Function that returns the latest PM 2.5 reading
     * @note Sensor reports new reading ~ every 1 sec.
-    * @return  PM 2.5 reading (float)
+    * @return  PM 2.5 reading (unsigned int)
     */
-    float GetPM2_5();
+    unsigned int GetPM2_5();
 
     /**
     * @brief Function that returns the latest PM 10 reading
     * @note Sensor reports new reading ~ every 1 sec.
-    * @return  PM 10 reading (float)
+    * @return  PM 10 reading (unsigned int)
     */
-    float GetPM10();
+    unsigned int GetPM10();
 
 private:
     Stream& _serial;
 
     //Latest PM 2.5 reading
-    float _pm2_5 = 0;
+    unsigned int _pm2_5 = 0;
 
     //Latest PM 10 reading
-    float _pm10 = 0;
+    unsigned int _pm10 = 0;
 
     /**
      * @brief Function that sends serial command to sensor
      * @param  a char * containing the command
      * @param size of buffer
-     * @return  a String containing sensor response
+     * @return  void
      */
-    String SendCmd(char * command, unsigned int size);
+    void SendCmd(unsigned char * command, unsigned int size);
+
+    /**
+    * @brief Function that reads command response from sensor
+    * @param Buffer to store data in
+    * @param Buffer size
+    * @param Expected command type
+    * @return  returns number of bytes read from sensor
+    */
+    int ReadCmdResp(unsigned char * dataBuf, unsigned int dataBufSize, unsigned int cmdType);
 };
 
 #endif
