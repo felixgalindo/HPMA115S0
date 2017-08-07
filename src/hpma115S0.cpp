@@ -30,7 +30,7 @@ HPMA115S0::HPMA115S0(Stream& serial):
 /**
  * @brief Function that initializes sensor
  * @return  a String containing sensor response
- */
+ **/
 void HPMA115S0::Init() {
   Serial.println("PS- Initializing...");
   delay(100);
@@ -45,7 +45,8 @@ void HPMA115S0::Init() {
  * @param size of buffer
  * @return  void
  */
-void HPMA115S0::SendCmd(unsigned char * cmdBuf, unsigned int cmdSize) {
+void HPMA115S0::SendCmd(const char * constCmdBuf, unsigned int cmdSize) {
+  unsigned char* cmdBuf = reinterpret_cast<unsigned char*>(const_cast<char*>(constCmdBuf));
   //Clear RX
   while (_serial.available())
     _serial.read();
