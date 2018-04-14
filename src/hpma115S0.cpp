@@ -7,7 +7,7 @@
  */
 
 #include "Arduino.h"
-#include "HPMA115S0.h"
+#include "hpma115S0.h"
 
 extern "C" {
 #include <string.h>
@@ -105,6 +105,12 @@ int HPMA115S0::ReadCmdResp(unsigned char * dataBuf, unsigned int dataBufSize, un
       }
     }
   }
+  #ifdef DEBUG
+  else {
+    Serial.println("_serial.readStringUntil Returned false");
+  }
+  #endif
+
   return false;
 }
 
