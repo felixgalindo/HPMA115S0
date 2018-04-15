@@ -22,7 +22,7 @@ extern "C" {
  * @return  void
  */
 HPMA115S0::HPMA115S0(Stream& serial):
-  _serial(serial)
+  _serial(serial) //Serial is the self instance (I think)
 {
   _serial.setTimeout(100);
 }
@@ -36,7 +36,7 @@ void HPMA115S0::Init() {
   delay(100);
   StartParticleMeasurement();
   delay(100);
-  DisableAutoSend();
+   DisableAutoSend();
 }
 
 /**
@@ -84,6 +84,16 @@ int HPMA115S0::ReadCmdResp(unsigned char * dataBuf, unsigned int dataBufSize, un
     delay(1); //wait for the rest of the bytes to arrive
     respBuf[HPM_HEAD_IDX] = HPM_CMD_RESP_HEAD;
     respBuf[HPM_LEN_IDX] = _serial.read(); //Read the command length
+      // send data only when you receive data:
+  int incomingByte = 0;
+  if (_serial.available() > 0) {
+    // read the incoming byte:
+    incomingByte = _serial.read();
+
+    // say what you got:
+    Serial.print("I received: ");
+    Serial.println(incomingByte, DEC);
+  }
 
     //Ensure buffers are big enough
     if (respBuf[HPM_LEN_IDX] && ((respBuf[HPM_LEN_IDX] + 1) <=  sizeof(respBuf) - 2) && (respBuf[HPM_LEN_IDX] - 1) <= dataBufSize ) {
@@ -96,7 +106,7 @@ int HPMA115S0::ReadCmdResp(unsigned char * dataBuf, unsigned int dataBufSize, un
           }
           calChecksum = (65536 - calChecksum) % 256;
           if (calChecksum == respBuf[2 + respBuf[HPM_LEN_IDX]]) {
-            Serial.println("PS- Received valid data!!!");
+            Serial.println("PS- Received valid data!");
             memset(dataBuf, 0, dataBufSize);
             memcpy(dataBuf, &respBuf[HPM_DATA_START_IDX], respBuf[HPM_LEN_IDX] - 1);
             return (respBuf[HPM_LEN_IDX] - 1);
@@ -104,6 +114,15 @@ int HPMA115S0::ReadCmdResp(unsigned char * dataBuf, unsigned int dataBufSize, un
         }
       }
     }
+    #ifdef DEBUG
+    else {
+      Serial.println("Error Reading: Buffers not big enough.");
+      Serial.print("respBuf[HPM_LEN_IDX] = "); Serial.println(respBuf[HPM_LEN_IDX]);
+      Serial.print("sizeof respBuf = "); Serial.println(sizeof(respBuf));
+      Serial.print("dataBufSize = "); Serial.println(dataBufSize);
+      Serial.print("HPM_LEN_IDX = "); Serial.println(HPM_LEN_IDX);
+    }
+    #endif
   }
   #ifdef DEBUG
   else {
