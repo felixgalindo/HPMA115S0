@@ -15,7 +15,7 @@
 #define HPM_CMD_RESP_HEAD 0x40
 #define HPM_MAX_RESP_SIZE 8 // max command response size is 8 bytes
 #define HPM_READ_PARTICLE_MEASURMENT_LEN 5
-#define DEBUG // uncomment for more debugging messages
+#define DEBUG
 
 enum CMD_TYPE_T {
     READ_PARTICLE_MEASURMENT = 0x04,
