@@ -84,13 +84,11 @@ int HPMA115S0::ReadCmdResp(unsigned char * dataBuf, unsigned int dataBufSize, un
     delay(1); //wait for the rest of the bytes to arrive
     respBuf[HPM_HEAD_IDX] = HPM_CMD_RESP_HEAD;
     respBuf[HPM_LEN_IDX] = _serial.read();
-      // send data only when you receive data:
-  int incomingByte = 0;
 
     #ifdef DEBUG
     // say what you got:
     if(respBuf[HPM_LEN_IDX] == -1) {
-      Serial.println("There was no data to read.")
+      Serial.println("There was no data to read.");
     }
     else {
       Serial.print("I received: ");
@@ -120,11 +118,12 @@ int HPMA115S0::ReadCmdResp(unsigned char * dataBuf, unsigned int dataBufSize, un
     #ifdef DEBUG
     else {
       Serial.println("Error Reading: Buffers not big enough.");
-      Serial.println("This error is probably hardware related. Check connections.")
+      Serial.println("This error is probably hardware related. Check connections.");
       Serial.print("respBuf[HPM_LEN_IDX] = "); Serial.println(respBuf[HPM_LEN_IDX]);
       Serial.print("sizeof respBuf = "); Serial.println(sizeof(respBuf));
       Serial.print("dataBufSize = "); Serial.println(dataBufSize);
       Serial.print("HPM_LEN_IDX = "); Serial.println(HPM_LEN_IDX);
+      //Serial.print("pm_10 = "); Serial.println(String(_pm10));
     }
     #endif
   }
