@@ -7,7 +7,7 @@
  */
 
 #include "Arduino.h"
-#include "HPMA115S0.h"
+#include "hpma115S0.h"
 
 extern "C" {
 #include <string.h>
@@ -21,8 +21,8 @@ extern "C" {
  * @note The serial stream should be already initialized
  * @return  void
  */
-HPMA115S0::HPMA115S0(Stream& serial):
-  _serial(serial)
+HPMA115S0::HPMA115S0(Stream& serial): // pass in serial instance as stream (can be hardware or software serial)
+  _serial(serial) // _serial references self instance of HPMA115S0 class
 {
   _serial.setTimeout(100);
 }
@@ -36,7 +36,7 @@ void HPMA115S0::Init() {
   delay(100);
   StartParticleMeasurement();
   delay(100);
-  DisableAutoSend();
+   DisableAutoSend();
 }
 
 /**
@@ -83,7 +83,18 @@ int HPMA115S0::ReadCmdResp(unsigned char * dataBuf, unsigned int dataBufSize, un
   if (_serial.readStringUntil(HPM_CMD_RESP_HEAD)) {
     delay(1); //wait for the rest of the bytes to arrive
     respBuf[HPM_HEAD_IDX] = HPM_CMD_RESP_HEAD;
-    respBuf[HPM_LEN_IDX] = _serial.read(); //Read the command length
+    respBuf[HPM_LEN_IDX] = _serial.read();
+
+    #ifdef DEBUG
+    // say what you got:
+    if(respBuf[HPM_LEN_IDX] == -1) {
+      Serial.println("There was no data to read.");
+    }
+    else {
+      Serial.print("I received: ");
+      Serial.println(respBuf[HPM_LEN_IDX], DEC);
+    }
+    #endif
 
     //Ensure buffers are big enough
     if (respBuf[HPM_LEN_IDX] && ((respBuf[HPM_LEN_IDX] + 1) <=  sizeof(respBuf) - 2) && (respBuf[HPM_LEN_IDX] - 1) <= dataBufSize ) {
@@ -96,7 +107,7 @@ int HPMA115S0::ReadCmdResp(unsigned char * dataBuf, unsigned int dataBufSize, un
           }
           calChecksum = (65536 - calChecksum) % 256;
           if (calChecksum == respBuf[2 + respBuf[HPM_LEN_IDX]]) {
-            Serial.println("PS- Received valid data!!!");
+            Serial.println("PS- Received valid data!");
             memset(dataBuf, 0, dataBufSize);
             memcpy(dataBuf, &respBuf[HPM_DATA_START_IDX], respBuf[HPM_LEN_IDX] - 1);
             return (respBuf[HPM_LEN_IDX] - 1);
@@ -104,7 +115,24 @@ int HPMA115S0::ReadCmdResp(unsigned char * dataBuf, unsigned int dataBufSize, un
         }
       }
     }
+    #ifdef DEBUG
+    else {
+      Serial.println("Error Reading: Buffers not big enough.");
+      Serial.println("This error is probably hardware related. Check connections.");
+      Serial.print("respBuf[HPM_LEN_IDX] = "); Serial.println(respBuf[HPM_LEN_IDX]);
+      Serial.print("sizeof respBuf = "); Serial.println(sizeof(respBuf));
+      Serial.print("dataBufSize = "); Serial.println(dataBufSize);
+      Serial.print("HPM_LEN_IDX = "); Serial.println(HPM_LEN_IDX);
+      //Serial.print("pm_10 = "); Serial.println(String(_pm10));
+    }
+    #endif
   }
+  #ifdef DEBUG
+  else {
+    Serial.println("_serial.readStringUntil Returned false");
+  }
+  #endif
+
   return false;
 }
 
