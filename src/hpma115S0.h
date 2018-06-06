@@ -108,7 +108,7 @@ private:
      * @param size of buffer
      * @return  void
      */
-    void SendCmd(unsigned char * command, unsigned int size);
+    void SendCmd(char * command, unsigned int size);
 
     /**
     * @brief Function that reads command response from sensor
