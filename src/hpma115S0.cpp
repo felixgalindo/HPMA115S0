@@ -45,7 +45,7 @@ void HPMA115S0::Init() {
  * @param size of buffer
  * @return  void
  */
-void HPMA115S0::SendCmd(unsigned char * cmdBuf, unsigned int cmdSize) {
+void HPMA115S0::SendCmd(char * cmdBuf, unsigned int cmdSize) {
   //Clear RX
   while (_serial.available())
     _serial.read();
@@ -69,7 +69,7 @@ void HPMA115S0::SendCmd(unsigned char * cmdBuf, unsigned int cmdSize) {
  * @param Expected command type
  * @return  returns number of bytes read from sensor
  */
-int HPMA115S0::ReadCmdResp(unsigned char * dataBuf, unsigned int dataBufSize, unsigned int cmdType) {
+int HPMA115S0::ReadCmdResp(char * dataBuf, unsigned int dataBufSize, unsigned int cmdType) {
   static unsigned char respBuf[HPM_MAX_RESP_SIZE];
   static unsigned int respIdx = 0;
   static unsigned int calChecksum = 0;
@@ -114,8 +114,8 @@ int HPMA115S0::ReadCmdResp(unsigned char * dataBuf, unsigned int dataBufSize, un
  * @return  returns true if valid measurements were read from sensor
  */
 boolean HPMA115S0::ReadParticleMeasurement(unsigned int * pm2_5, unsigned int * pm10) {
-  unsigned char cmdBuf[] = {0x68, 0x01, 0x04, 0x93};
-  static unsigned char dataBuf[HPM_READ_PARTICLE_MEASURMENT_LEN - 1];
+  char cmdBuf[] = {0x68, 0x01, 0x04, 0x93};
+  char dataBuf[HPM_READ_PARTICLE_MEASURMENT_LEN - 1];
 
   Serial.println("PS- Reading Particle Measurements..." );
 
@@ -140,7 +140,7 @@ boolean HPMA115S0::ReadParticleMeasurement(unsigned int * pm2_5, unsigned int * 
  * @return  void
  */
 void HPMA115S0::StartParticleMeasurement() {
-  unsigned char cmd[] = {0x68, 0x01, 0x01, 0x96};
+  char cmd[] = {0x68, 0x01, 0x01, 0x96};
   SendCmd(cmd, 4);
 }
 
@@ -149,7 +149,7 @@ void HPMA115S0::StartParticleMeasurement() {
  * @return  void
  */
 void HPMA115S0::StopParticleMeasurement() {
-  unsigned char cmd[] = {0x68, 0x01, 0x02, 0x95};
+  char cmd[] = {0x68, 0x01, 0x02, 0x95};
   SendCmd(cmd, 4);
 }
 
@@ -158,7 +158,7 @@ void HPMA115S0::StopParticleMeasurement() {
  * @return  void
  */
 void HPMA115S0::EnableAutoSend() {
-  unsigned char cmd[] = {0x68, 0x01, 0x40, 0x57};
+  char cmd[] = {0x68, 0x01, 0x40, 0x57};
   SendCmd(cmd, 4);
 }
 
@@ -167,7 +167,7 @@ void HPMA115S0::EnableAutoSend() {
  * @return  void
  */
 void HPMA115S0::DisableAutoSend() {
-  unsigned char cmd[] = {0x68, 0x01, 0x20, 0x77};
+  char cmd[] = {0x68, 0x01, 0x20, 0x77};
   SendCmd(cmd, 4);
 }
 
