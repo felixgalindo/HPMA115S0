@@ -51,14 +51,14 @@ void HPMA115S0::SendCmd(char * cmdBuf, unsigned int cmdSize) {
     _serial.read();
 
   //Send command
-  Serial.print("PS- Sending cmd: ");
+  //Serial.print("PS- Sending cmd: ");
   unsigned int index = 0;
   for (index = 0; index < cmdSize; index++) {
-    Serial.print(cmdBuf[index], HEX);
-    Serial.print(" ");
+    //Serial.print(cmdBuf[index], HEX);
+    //Serial.print(" ");
     _serial.write(cmdBuf[index]);
   }
-  Serial.println("");
+  //Serial.println("");
   return;
 }
 
@@ -79,7 +79,7 @@ int HPMA115S0::ReadCmdResp(char * dataBuf, unsigned int dataBufSize, unsigned in
   calChecksum = 0;
   memset(respBuf, 0, sizeof(respBuf));
   _serial.setTimeout(100);
-  Serial.println("PS- Waiting for cmd resp...");
+  //Serial.println("PS- Waiting for cmd resp...");
   if (_serial.readStringUntil(HPM_CMD_RESP_HEAD)) {
     delay(1); //wait for the rest of the bytes to arrive
     respBuf[HPM_HEAD_IDX] = HPM_CMD_RESP_HEAD;
@@ -96,7 +96,7 @@ int HPMA115S0::ReadCmdResp(char * dataBuf, unsigned int dataBufSize, unsigned in
           }
           calChecksum = (65536 - calChecksum) % 256;
           if (calChecksum == respBuf[2 + respBuf[HPM_LEN_IDX]]) {
-            Serial.println("PS- Received valid data!!!");
+            //Serial.println("PS- Received valid data!!!");
             memset(dataBuf, 0, dataBufSize);
             memcpy(dataBuf, &respBuf[HPM_DATA_START_IDX], respBuf[HPM_LEN_IDX] - 1);
             return (respBuf[HPM_LEN_IDX] - 1);
@@ -117,7 +117,7 @@ boolean HPMA115S0::ReadParticleMeasurement(unsigned int * pm2_5, unsigned int * 
   char cmdBuf[] = {0x68, 0x01, 0x04, 0x93};
   char dataBuf[HPM_READ_PARTICLE_MEASURMENT_LEN - 1];
 
-  Serial.println("PS- Reading Particle Measurements..." );
+  //Serial.println("PS- Reading Particle Measurements..." );
 
   //Send command
   SendCmd(cmdBuf, 4);
