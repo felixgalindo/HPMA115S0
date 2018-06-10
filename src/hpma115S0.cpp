@@ -32,7 +32,7 @@ HPMA115S0::HPMA115S0(Stream& serial):
  * @return  a String containing sensor response
  */
 void HPMA115S0::Init() {
-  Serial.println("PS- Initializing...");
+  //Serial.println("PS- Initializing...");
   delay(100);
   StartParticleMeasurement();
   delay(100);
