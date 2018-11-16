@@ -7,7 +7,7 @@
  */
 
 #include "Arduino.h"
-#include "HPMA115S0.h"
+#include "hpma115S0.h"
 
 extern "C" {
 #include <string.h>
