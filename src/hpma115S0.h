@@ -11,6 +11,7 @@
 #define HPMA115S0_H
 
 #include "Arduino.h"
+#include <stdint.h>
 
 #define HPM_CMD_RESP_HEAD 0x40
 #define HPM_MAX_RESP_SIZE 8 // max command response size is 8 bytes
@@ -108,7 +109,7 @@ private:
      * @param size of buffer
      * @return  void
      */
-    void SendCmd(char * command, unsigned int size);
+    void SendCmd(uint8_t * command, unsigned int size);
 
     /**
     * @brief Function that reads command response from sensor

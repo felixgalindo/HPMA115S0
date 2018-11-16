@@ -45,7 +45,7 @@ void HPMA115S0::Init() {
  * @param size of buffer
  * @return  void
  */
-void HPMA115S0::SendCmd(char * cmdBuf, unsigned int cmdSize) {
+void HPMA115S0::SendCmd(uint8_t * cmdBuf, unsigned int cmdSize) {
   //Clear RX
   while (_serial.available())
     _serial.read();
@@ -114,7 +114,7 @@ int HPMA115S0::ReadCmdResp(char * dataBuf, unsigned int dataBufSize, unsigned in
  * @return  returns true if valid measurements were read from sensor
  */
 boolean HPMA115S0::ReadParticleMeasurement(unsigned int * pm2_5, unsigned int * pm10) {
-  char cmdBuf[] = {0x68, 0x01, 0x04, 0x93};
+  uint8_t cmdBuf[] = {0x68, 0x01, 0x04, 0x93};
   char dataBuf[HPM_READ_PARTICLE_MEASURMENT_LEN - 1];
 
   //Serial.println("PS- Reading Particle Measurements..." );
@@ -140,7 +140,7 @@ boolean HPMA115S0::ReadParticleMeasurement(unsigned int * pm2_5, unsigned int * 
  * @return  void
  */
 void HPMA115S0::StartParticleMeasurement() {
-  char cmd[] = {0x68, 0x01, 0x01, 0x96};
+  uint8_t cmd[] = {0x68, 0x01, 0x01, 0x96};
   SendCmd(cmd, 4);
 }
 
@@ -149,7 +149,7 @@ void HPMA115S0::StartParticleMeasurement() {
  * @return  void
  */
 void HPMA115S0::StopParticleMeasurement() {
-  char cmd[] = {0x68, 0x01, 0x02, 0x95};
+  uint8_t cmd[] = {0x68, 0x01, 0x02, 0x95};
   SendCmd(cmd, 4);
 }
 
@@ -158,7 +158,7 @@ void HPMA115S0::StopParticleMeasurement() {
  * @return  void
  */
 void HPMA115S0::EnableAutoSend() {
-  char cmd[] = {0x68, 0x01, 0x40, 0x57};
+  uint8_t cmd[] = {0x68, 0x01, 0x40, 0x57};
   SendCmd(cmd, 4);
 }
 
@@ -167,7 +167,7 @@ void HPMA115S0::EnableAutoSend() {
  * @return  void
  */
 void HPMA115S0::DisableAutoSend() {
-  char cmd[] = {0x68, 0x01, 0x20, 0x77};
+  uint8_t cmd[] = {0x68, 0x01, 0x20, 0x77};
   SendCmd(cmd, 4);
 }
 
