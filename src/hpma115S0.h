@@ -15,13 +15,14 @@
 #define HPM_CMD_RESP_HEAD 0x40
 #define HPM_MAX_RESP_SIZE 8 // max command response size is 8 bytes
 #define HPM_READ_PARTICLE_MEASURMENT_LEN 5
+#define HPM_READ_ADJUSTMENT_COEFFICIENT_LEN 2
 
 enum CMD_TYPE_T {
     READ_PARTICLE_MEASURMENT = 0x04,
     START_PARTICLE_MEASURMENT = 0x01,
     STOP_PARTICLE_MEASURMENT = 0x02,
     SET_ADJUSTMENT_COEFFICIENT = 0x08,
-    READ_ADJUSTMENT_COEFFICIENT = 0x08,
+    READ_ADJUSTMENT_COEFFICIENT = 0x10,
     STOP_AUTO_SEND = 0x20,
     ENABLE_AUTO_SEND = 0x40,
 };
@@ -53,7 +54,7 @@ public:
     /**
      * @brief Function that sends a read command to sensor
      * @return  returns true if valid measurements were read from sensor
-     */boolean ReadParticleMeasurement(unsigned int * pm2_5, unsigned int * pm10)
+     */boolean ReadParticleMeasurement(unsigned short * pm2_5, unsigned short * pm10)
     ;
 
     /**
@@ -84,23 +85,30 @@ public:
     * @note Sensor reports new reading ~ every 1 sec.
     * @return  PM 2.5 reading (unsigned int)
     */
-    unsigned int GetPM2_5();
+    unsigned short GetPM2_5();
 
     /**
     * @brief Function that returns the latest PM 10 reading
     * @note Sensor reports new reading ~ every 1 sec.
     * @return  PM 10 reading (unsigned int)
     */
-    unsigned int GetPM10();
+    unsigned short GetPM10();
+
+	unsigned short getAdjustmentCoefficient();
+
+	void setAdjustmentCoefficient(unsigned short coeeficient);
 
 private:
     Stream& _serial;
 
     //Latest PM 2.5 reading
-    unsigned int _pm2_5 = 0;
+    unsigned short _pm2_5 = 0;
 
     //Latest PM 10 reading
-    unsigned int _pm10 = 0;
+    unsigned short _pm10 = 0;
+
+	//Latest adjustment coeeficient
+	unsigned short _coefficiency = 0;
 
     /**
      * @brief Function that sends serial command to sensor
@@ -108,7 +116,7 @@ private:
      * @param size of buffer
      * @return  void
      */
-    void SendCmd(unsigned char * command, unsigned int size);
+    void SendCmd(const char * command, unsigned short size);
 
     /**
     * @brief Function that reads command response from sensor
@@ -117,7 +125,7 @@ private:
     * @param Expected command type
     * @return  returns number of bytes read from sensor
     */
-    int ReadCmdResp(unsigned char * dataBuf, unsigned int dataBufSize, unsigned int cmdType);
+    short ReadCmdResp(unsigned char * dataBuf, unsigned short dataBufSize, unsigned short cmdType);
 };
 
 #endif
