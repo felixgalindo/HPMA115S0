@@ -1,7 +1,7 @@
 /**
  *
  * @file HPMA115S0.h
- * @author Felix Galindo (felixgalindo91@gmail.com)
+ * @author Felix A. Galindo 
  * @date June 2017
  * @brief Arduino Library for Honeywell's Particle Sensor (HPMA115S0-XXX)
  *
