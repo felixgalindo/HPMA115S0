@@ -9,6 +9,8 @@
 #include "Arduino.h"
 #include "HPMA115S0.h"
 
+#define DEBUG_HPMA115S0 true
+
 extern "C" {
 #include <string.h>
 #include <stdlib.h>
@@ -30,9 +32,9 @@ HPMA115S0::HPMA115S0(Stream& serial):
 /**
  * @brief Function that initializes sensor
  * @return  a String containing sensor response
- */
+ **/
 void HPMA115S0::Init() {
-  Serial.println("PS- Initializing...");
+  if (DEBUG_HPMA115S0) Serial.println("PS- Initializing...");
   delay(100);
   StartParticleMeasurement();
   delay(100);
@@ -45,20 +47,22 @@ void HPMA115S0::Init() {
  * @param size of buffer
  * @return  void
  */
-void HPMA115S0::SendCmd(const char * cmdBuf, unsigned int cmdSize) {
+
+void HPMA115S0::SendCmd(const char * constCmdBuf, unsigned short cmdSize) {
+  
   //Clear RX
   while (_serial.available())
     _serial.read();
 
   //Send command
-  Serial.print("PS- Sending cmd: ");
-  unsigned int index = 0;
+  if (DEBUG_HPMA115S0)Serial.print("PS- Sending cmd: ");
+  unsigned short index = 0;
   for (index = 0; index < cmdSize; index++) {
-    Serial.print(cmdBuf[index], HEX);
-    Serial.print(" ");
+    if (DEBUG_HPMA115S0) Serial.print(cmdBuf[index], HEX);
+    if (DEBUG_HPMA115S0) Serial.print(" ");
     _serial.write(cmdBuf[index]);
   }
-  Serial.println("");
+  if (DEBUG_HPMA115S0) Serial.println("");
   return;
 }
 
@@ -69,21 +73,23 @@ void HPMA115S0::SendCmd(const char * cmdBuf, unsigned int cmdSize) {
  * @param Expected command type
  * @return  returns number of bytes read from sensor
  */
-int HPMA115S0::ReadCmdResp(unsigned char * dataBuf, unsigned int dataBufSize, unsigned int cmdType) {
+short HPMA115S0::ReadCmdResp(unsigned char * dataBuf, unsigned short dataBufSize, unsigned short cmdType) {
   static unsigned char respBuf[HPM_MAX_RESP_SIZE];
-  static unsigned int respIdx = 0;
-  static unsigned int calChecksum = 0;
+  static unsigned short respIdx = 0;
+  static unsigned short calChecksum = 0;
 
   //Read response
   respIdx = 0;
   calChecksum = 0;
   memset(respBuf, 0, sizeof(respBuf));
   _serial.setTimeout(100);
-  Serial.println("PS- Waiting for cmd resp...");
+  if (DEBUG_HPMA115S0) Serial.println("PS- Waiting for cmd resp...");
   if (_serial.readStringUntil(HPM_CMD_RESP_HEAD)) {
     delay(1); //wait for the rest of the bytes to arrive
     respBuf[HPM_HEAD_IDX] = HPM_CMD_RESP_HEAD;
     respBuf[HPM_LEN_IDX] = _serial.read(); //Read the command length
+
+	if (DEBUG_HPMA115S0) Serial.println("PS- Read completed");
 
     //Ensure buffers are big enough
     if (respBuf[HPM_LEN_IDX] && ((respBuf[HPM_LEN_IDX] + 1) <=  sizeof(respBuf) - 2) && (respBuf[HPM_LEN_IDX] - 1) <= dataBufSize ) {
@@ -96,15 +102,28 @@ int HPMA115S0::ReadCmdResp(unsigned char * dataBuf, unsigned int dataBufSize, un
           }
           calChecksum = (65536 - calChecksum) % 256;
           if (calChecksum == respBuf[2 + respBuf[HPM_LEN_IDX]]) {
-            Serial.println("PS- Received valid data!!!");
+            if (DEBUG_HPMA115S0) Serial.println("PS- Received valid data!!!");
             memset(dataBuf, 0, dataBufSize);
             memcpy(dataBuf, &respBuf[HPM_DATA_START_IDX], respBuf[HPM_LEN_IDX] - 1);
             return (respBuf[HPM_LEN_IDX] - 1);
           }
         }
+		else
+		{
+			if (DEBUG_HPMA115S0) Serial.println("PS- Wrong cmdType");
+		}
       }
+	  else
+	  {
+		if (DEBUG_HPMA115S0) Serial.println("PS- _serial.readBytes incorrect number of bytes");
+	  }
     }
+	else
+	{
+		if (DEBUG_HPMA115S0) Serial.println("PS- Buffer overflow");
+	}
   }
+  if (DEBUG_HPMA115S0) Serial.println("PS- Timeout while waiting for cmd resp");
   return false;
 }
 
@@ -113,12 +132,12 @@ int HPMA115S0::ReadCmdResp(unsigned char * dataBuf, unsigned int dataBufSize, un
  * @brief Function that sends a read command to sensor
  * @return  returns true if valid measurements were read from sensor
  */
-boolean HPMA115S0::ReadParticleMeasurement(unsigned int * pm2_5, unsigned int * pm10) {
+boolean HPMA115S0::ReadParticleMeasurement(unsigned short * pm2_5, unsigned short * pm10) {
   const char cmdBuf[] = {0x68, 0x01, 0x04, 0x93};
   static unsigned char dataBuf[HPM_READ_PARTICLE_MEASURMENT_LEN_C - 1];
   int len;
 
-  Serial.println("PS- Reading Particle Measurements..." );
+  if (DEBUG_HPMA115S0) Serial.println("PS- Reading Particle Measurements..." );
 
   //Send command
   SendCmd(cmdBuf, 4);
@@ -186,7 +205,7 @@ void HPMA115S0::DisableAutoSend() {
 * @note Sensor reports new reading ~ every 1 sec.
 * @return  PM 2.5 reading (unsigned int)
 */
-unsigned int HPMA115S0::GetPM2_5() {
+unsigned short HPMA115S0::GetPM2_5() {
   return _pm2_5;
 }
 
@@ -195,6 +214,26 @@ unsigned int HPMA115S0::GetPM2_5() {
 * @note Sensor reports new reading ~ every 1 sec.
 * @return  PM 10 reading (unsigned int)
 */
-unsigned int HPMA115S0::GetPM10() {
+unsigned short HPMA115S0::GetPM10() {
   return _pm10;
+}
+
+unsigned short HPMA115S0::getAdjustmentCoefficient() {
+  const char cmd[] = {0x68, 0x01, 0x10, 0x87};
+  SendCmd(cmd, 4);
+
+  static unsigned char dataBuf[HPM_READ_ADJUSTMENT_COEFFICIENT_LEN - 1];
+  
+  if (ReadCmdResp(dataBuf, sizeof(dataBuf), READ_ADJUSTMENT_COEFFICIENT) == (HPM_READ_ADJUSTMENT_COEFFICIENT_LEN - 1)) {
+    _coefficiency = dataBuf[0];
+    return _coefficiency;
+  }
+
+  return 0;
+}
+
+void HPMA115S0::setAdjustmentCoefficient(unsigned short coefficient)
+{
+  const char cmd[] = {0x68, 0x02, 0x8, coefficient};
+  SendCmd(cmd, 3);
 }
