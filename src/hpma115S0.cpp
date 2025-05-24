@@ -47,8 +47,9 @@ void HPMA115S0::Init() {
  * @param size of buffer
  * @return  void
  */
+
 void HPMA115S0::SendCmd(const char * constCmdBuf, unsigned short cmdSize) {
-  unsigned char* cmdBuf = reinterpret_cast<unsigned char*>(const_cast<char*>(constCmdBuf));
+  
   //Clear RX
   while (_serial.available())
     _serial.read();
@@ -133,7 +134,8 @@ short HPMA115S0::ReadCmdResp(unsigned char * dataBuf, unsigned short dataBufSize
  */
 boolean HPMA115S0::ReadParticleMeasurement(unsigned short * pm2_5, unsigned short * pm10) {
   const char cmdBuf[] = {0x68, 0x01, 0x04, 0x93};
-  static unsigned char dataBuf[HPM_READ_PARTICLE_MEASURMENT_LEN - 1];
+  static unsigned char dataBuf[HPM_READ_PARTICLE_MEASURMENT_LEN_C - 1];
+  int len;
 
   if (DEBUG_HPMA115S0) Serial.println("PS- Reading Particle Measurements..." );
 
@@ -141,9 +143,18 @@ boolean HPMA115S0::ReadParticleMeasurement(unsigned short * pm2_5, unsigned shor
   SendCmd(cmdBuf, 4);
 
   //Read response
-  if (ReadCmdResp(dataBuf, sizeof(dataBuf), READ_PARTICLE_MEASURMENT) == (HPM_READ_PARTICLE_MEASURMENT_LEN - 1)) {
-    _pm2_5 = dataBuf[0] * 256 + dataBuf[1];
-    _pm10 = dataBuf[2] * 256 + dataBuf[3];
+  len = ReadCmdResp(dataBuf, sizeof(dataBuf), READ_PARTICLE_MEASURMENT);
+  if ((len == (HPM_READ_PARTICLE_MEASURMENT_LEN - 1)) || (len == (HPM_READ_PARTICLE_MEASURMENT_LEN_C - 1))) {
+
+    if (len == (HPM_READ_PARTICLE_MEASURMENT_LEN - 1)) {
+      // HPMA115S0 Standard devices
+      _pm2_5 = dataBuf[0] * 256 + dataBuf[1];
+      _pm10 = dataBuf[2] * 256 + dataBuf[3];
+    } else {
+      // HPMA115C0 Compact devices
+      _pm2_5 = dataBuf[2] * 256 + dataBuf[3];
+      _pm10 = dataBuf[6] * 256 + dataBuf[7];
+    } 
     *pm2_5 = _pm2_5;
     *pm10 = _pm10;
     // Serial.println("PS- PM 2.5: " + String(_pm2_5) + " ug/m3" );

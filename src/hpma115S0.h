@@ -1,7 +1,7 @@
 /**
  *
  * @file HPMA115S0.h
- * @author Felix Galindo (felixgalindo91@gmail.com)
+ * @author Felix A. Galindo 
  * @date June 2017
  * @brief Arduino Library for Honeywell's Particle Sensor (HPMA115S0-XXX)
  *
@@ -16,6 +16,7 @@
 #define HPM_MAX_RESP_SIZE 8 // max command response size is 8 bytes
 #define HPM_READ_PARTICLE_MEASURMENT_LEN 5
 #define HPM_READ_ADJUSTMENT_COEFFICIENT_LEN 2
+
 
 enum CMD_TYPE_T {
     READ_PARTICLE_MEASURMENT = 0x04,
@@ -54,8 +55,8 @@ public:
     /**
      * @brief Function that sends a read command to sensor
      * @return  returns true if valid measurements were read from sensor
-     */boolean ReadParticleMeasurement(unsigned short * pm2_5, unsigned short * pm10)
-    ;
+     */boolean ReadParticleMeasurement(unsigned short * pm2_5, unsigned short * pm10);
+
 
     /**
      * @brief Function that starts sensor measurement
@@ -117,6 +118,7 @@ private:
      * @return  void
      */
     void SendCmd(const char * command, unsigned short size);
+
 
     /**
     * @brief Function that reads command response from sensor
